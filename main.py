@@ -1,3 +1,4 @@
+import time
 import random
 import pygame
 from pygame.constants import QUIT, K_DOWN, K_UP, K_LEFT, K_RIGHT
@@ -15,6 +16,8 @@ COLOR_BLACK = (0,0,0)
 COLOR_BLUE = (0,0,255)
 COLOR_GREEN = (0, 255, 0)
 
+padding = 20
+
 main_display = pygame.display.set_mode((WIDTH, HEIGHT))
 
 bg = pygame.transform.scale(pygame.image.load('img/background.png'), (WIDTH, HEIGHT))
@@ -22,30 +25,33 @@ bg_X1 = 0
 bg_X2 = bg.get_width()
 bg_move = 3
 
-player_size = (20, 20)
-player = pygame.image.load('img/player.png').convert_alpha()
-# player.fill(COLOR_BLACK)
-player_rect = player.get_rect(topleft=(1,1))
+
+player = pygame.image.load('img/goose/1-1.png').convert_alpha()
+player_size = player.get_size()
+
+player_rect = player.get_rect()
+player_rect.center = main_display.get_rect().center
 player_move_down = [0, 4]
 player_move_right = [4, 0]
 player_move_up = [0, -4]
 player_move_left = [-5, 0]
 
+
 def create_enemy():
-    enemy_size = (30,30)
-    enemy = pygame.Surface(enemy_size)
-    enemy.fill(COLOR_BLUE)
-    enemy_rect = pygame.Rect(WIDTH, random.randint(0, HEIGHT), *enemy_size)
+    enemy = pygame.image.load('img/enemy.png').convert_alpha()
+    enemy_rect = pygame.Rect(WIDTH, random.randint(padding, HEIGHT - padding), *enemy.get_size())
     enenmy_move = [random.randint(-8, -4), 0]
     return [enemy, enemy_rect, enenmy_move]
 
 def create_bonus():
-    bonus_size = (25, 25)
-    bonus = pygame.Surface(bonus_size)
-    bonus.fill(COLOR_GREEN)
-    bonus_rect = pygame.Rect(random.randint(0, WIDTH), 0,*bonus_size)
+    bonus = pygame.image.load('img/bonus.png').convert_alpha()
+    # bonus = pygame.transform.scale(bonus, (105, 120))
+    bonus_rect = pygame.Rect(random.randint(bonus.get_width(), WIDTH - bonus.get_width()), -bonus.get_height(),*bonus.get_size())
     bonus_move = [0, random.randint(4, 8)]
     return [bonus, bonus_rect, bonus_move]
+
+
+
 
 CREATE_ENEMY = pygame.USEREVENT + 1
 CREATE_BONUS = pygame.USEREVENT + 2
@@ -62,6 +68,7 @@ playing = True
 
 while playing:
     FPS.tick(120)
+
     for event in pygame.event.get():
         if event.type == QUIT:
             playing = False
@@ -117,10 +124,8 @@ while playing:
     pygame.display.flip()
 
     for enemy in enemies:
-        if enemy[1].left < 0:
+        if enemy[1].right < 0:
             enemies.pop(enemies.index(enemy))
-
-        
 
     for bonus in bonuses:
         if bonus[1].top > HEIGHT:
